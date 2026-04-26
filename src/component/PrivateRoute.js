@@ -5,27 +5,48 @@ const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').repla
 
 /**
  * PrivateRoute — wraps protected routes.
- * Verifies the auth cookie with the backend before rendering.
- * Redirects to /admin (login page) if not authenticated.
+ * First checks for token in localStorage (instant).
+ * Then verifies with backend (background).
+ * Redirects to /admin (login page) only if truly unauthenticated.
  */
 export default function PrivateRoute({ children }) {
   const [authState, setAuthState] = useState('loading'); // 'loading' | 'authenticated' | 'unauthenticated'
 
   useEffect(() => {
     const verifyAuth = async () => {
+      // First check: Do we have a token in localStorage?
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        setAuthState('unauthenticated');
+        return;
+      }
+
+      // We have a token, optimistically set as authenticated
+      // (user will be logged out if backend rejects)
+      setAuthState('authenticated');
+
+      // Second check: Verify token with backend (non-blocking)
       try {
         const response = await fetch(`${API_URL}/login/verify`, {
           method: 'GET',
           credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         const data = await response.json();
-        if (response.ok && data.validUser) {
-          setAuthState('authenticated');
-        } else {
+        
+        if (!response.ok || !data.validUser) {
+          // Backend rejected token, logout
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('user_info');
           setAuthState('unauthenticated');
         }
-      } catch {
-        setAuthState('unauthenticated');
+        // If valid, stay authenticated (already set above)
+      } catch (error) {
+        console.warn('Token verification error (non-blocking):', error.message);
+        // Network error - don't logout, let user proceed
+        // They'll be logged out on next failed request
       }
     };
 

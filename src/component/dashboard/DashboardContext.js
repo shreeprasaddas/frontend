@@ -293,11 +293,35 @@ export function DashboardProvider({ children }) {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await apiService.verifyToken();
-      dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: isAuth });
-      
-      if (isAuth) {
-        await loadDashboardData();
+      // First check if we have a valid token in localStorage
+      if (apiService.hasValidToken()) {
+        // Immediately set authenticated state from localStorage
+        dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
+        
+        // Get saved user info if available
+        const userInfo = apiService.getUserInfo();
+        if (userInfo) {
+          dispatch({ type: actionTypes.LOGIN_SUCCESS, payload: userInfo });
+        }
+        
+        // Then verify with backend (non-blocking)
+        try {
+          const isValid = await apiService.verifyToken();
+          if (!isValid) {
+            // Backend rejected token, logout
+            apiService.logout();
+            dispatch({ type: actionTypes.LOGOUT });
+          } else {
+            // Token is valid, load dashboard data
+            await loadDashboardData();
+          }
+        } catch (error) {
+          console.warn('Auth verification error:', error);
+          // Ignore verification errors, user will be logged out if token is invalid
+        }
+      } else {
+        // No valid token, ensure logged out state
+        dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: false });
       }
     };
 
@@ -316,7 +340,13 @@ export function DashboardProvider({ children }) {
         const result = await apiService.login(credentials);
         
         if (result.token) {
-          dispatch({ type: actionTypes.LOGIN_SUCCESS, payload: { email: credentials.email } });
+          // Save user info to localStorage for quick restoration on refresh
+          const userData = { email: credentials.email };
+          apiService.saveUserInfo(userData);
+          
+          dispatch({ type: actionTypes.LOGIN_SUCCESS, payload: userData });
+          dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
+          
           await loadDashboardData();
           return { success: true };
         } else {

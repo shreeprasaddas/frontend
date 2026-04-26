@@ -19,14 +19,32 @@ class ApiService {
       ?.split('=')[1] || null;
   }
 
-  // Save token to localStorage after login
+  // Save token and user data to localStorage after login
   saveAuthToken(token) {
     localStorage.setItem('admin_token', token);
+    localStorage.setItem('auth_timestamp', Date.now().toString()); // Track when token was saved
   }
 
-  // Clear token from localStorage on logout
+  // Save user info for quick access
+  saveUserInfo(userData) {
+    localStorage.setItem('user_info', JSON.stringify(userData));
+  }
+
+  // Get saved user info
+  getUserInfo() {
+    try {
+      const info = localStorage.getItem('user_info');
+      return info ? JSON.parse(info) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Clear token and user data from localStorage on logout
   clearAuthToken() {
     localStorage.removeItem('admin_token');
+    localStorage.removeItem('user_info');
+    localStorage.removeItem('auth_timestamp');
   }
 
   // Helper method to make requests with proper headers
@@ -102,7 +120,23 @@ class ApiService {
       const response = await this.makeRequest('/login/verify', { method: 'GET' });
       return response && response.validUser === true;
     } catch (error) {
-      this.logout();
+      console.error('Token verification failed:', error.message);
+      // Don't automatically logout - just return false
+      // User will be logged out by the component if needed
+      return false;
+    }
+  }
+
+  // Check if user has a valid token (quick check without backend call)
+  hasValidToken() {
+    const token = this.getAuthToken();
+    if (!token) return false;
+    
+    try {
+      // Verify it's a JWT-like token (has 3 parts separated by dots)
+      const parts = token.split('.');
+      return parts.length === 3;
+    } catch {
       return false;
     }
   }
