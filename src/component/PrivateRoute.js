@@ -6,8 +6,8 @@ const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').repla
 /**
  * PrivateRoute — wraps protected routes.
  * First checks for token in localStorage (instant).
- * Then verifies with backend (background).
- * Redirects to /admin (login page) only if truly unauthenticated.
+ * Then verifies with backend (background, non-blocking).
+ * Redirects to /admin (login page) only if NO token in localStorage.
  */
 export default function PrivateRoute({ children }) {
   const [authState, setAuthState] = useState('loading'); // 'loading' | 'authenticated' | 'unauthenticated'
@@ -16,38 +16,51 @@ export default function PrivateRoute({ children }) {
     const verifyAuth = async () => {
       // First check: Do we have a token in localStorage?
       const token = localStorage.getItem('admin_token');
+      
       if (!token) {
+        // No token at all - user is not authenticated
+        console.log('No token in localStorage - redirecting to login');
         setAuthState('unauthenticated');
         return;
       }
 
-      // We have a token, optimistically set as authenticated
-      // (user will be logged out if backend rejects)
+      // We have a token in localStorage - optimistically authenticate
+      console.log('Token found in localStorage - user authenticated');
       setAuthState('authenticated');
 
-      // Second check: Verify token with backend (non-blocking)
-      try {
-        const response = await fetch(`${API_URL}/login/verify`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        
-        if (!response.ok || !data.validUser) {
-          // Backend rejected token, logout
-          localStorage.removeItem('admin_token');
-          localStorage.removeItem('user_info');
-          setAuthState('unauthenticated');
+      // Second check: Verify token with backend (background, non-blocking)
+      // This doesn't block the UI - we stay authenticated even if backend check fails
+      const verifyWithBackend = async () => {
+        try {
+          const response = await fetch(`${API_URL}/login/verify`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok || !data.validUser) {
+            // Backend explicitly rejected the token
+            console.log('Backend rejected token - logging out');
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('user_info');
+            setAuthState('unauthenticated');
+          } else {
+            console.log('Backend verified token - staying authenticated');
+          }
+        } catch (error) {
+          // Network error verifying with backend
+          // User stays authenticated with localStorage token
+          console.warn('Could not verify with backend (network error):', error.message);
+          console.log('User staying authenticated with localStorage token');
         }
-        // If valid, stay authenticated (already set above)
-      } catch (error) {
-        console.warn('Token verification error (non-blocking):', error.message);
-        // Network error - don't logout, let user proceed
-        // They'll be logged out on next failed request
-      }
+      };
+
+      // Run backend verification in background (don't await, don't block)
+      verifyWithBackend();
     };
 
     verifyAuth();

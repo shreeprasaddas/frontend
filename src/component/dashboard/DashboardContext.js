@@ -304,23 +304,41 @@ export function DashboardProvider({ children }) {
           dispatch({ type: actionTypes.LOGIN_SUCCESS, payload: userInfo });
         }
         
-        // Then verify with backend (non-blocking)
+        // Then verify with backend in background (doesn't block auth)
+        // Only logout if backend explicitly rejects the token
         try {
-          const isValid = await apiService.verifyToken();
-          if (!isValid) {
-            // Backend rejected token, logout
+          const response = await fetch(`${(process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/+$/, "")}/login/verify`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              Authorization: `Bearer ${apiService.getAuthToken()}`,
+            },
+          });
+          
+          const data = await response.json();
+          if (!response.ok || !data.validUser) {
+            // Backend explicitly says token is invalid
+            console.log('Backend rejected token - logging out');
             apiService.logout();
             dispatch({ type: actionTypes.LOGOUT });
           } else {
-            // Token is valid, load dashboard data
+            // Token verified, load data
             await loadDashboardData();
           }
         } catch (error) {
-          console.warn('Auth verification error:', error);
-          // Ignore verification errors, user will be logged out if token is invalid
+          // Network error - don't logout, just log it
+          // User stays authenticated with localStorage token
+          console.warn('Backend verification failed (network):', error.message);
+          console.log('Staying authenticated with localStorage token');
+          // Try to load data anyway
+          try {
+            await loadDashboardData();
+          } catch (e) {
+            console.warn('Failed to load dashboard data:', e);
+          }
         }
       } else {
-        // No valid token, ensure logged out state
+        // No valid token in localStorage
         dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: false });
       }
     };
