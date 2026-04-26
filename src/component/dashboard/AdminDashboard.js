@@ -735,7 +735,10 @@ function ProjectsSection() {
                   if (project.imgLink?.startsWith('http')) {
                     return project.imgLink;
                   }
-                  const cleanPath = project.imgLink?.startsWith('/') ? project.imgLink.slice(1) : project.imgLink;
+                  // For local paths, ensure proper URL construction with /uploads/
+                  const cleanPath = project.imgLink?.startsWith('/uploads/') 
+                    ? project.imgLink 
+                    : (project.imgLink?.startsWith('/') ? `/uploads${project.imgLink}` : `/uploads/${project.imgLink}`);
                   return `${webUrl}${cleanPath}`;
                 })()} 
                 alt={project.tittle || "Project"} 
