@@ -67,16 +67,16 @@ const Portfolio = () => {
                                             return project.imgLink;
                                         }
                                         const cleanPath = project.imgLink?.startsWith('/') ? project.imgLink.slice(1) : project.imgLink;
-                                        return `${webUrl}${encodeURIComponent(cleanPath)}`;
+                                        return `${webUrl}${cleanPath}`;
                                     })()} 
                                     alt={project.tittle || "Project"} 
                                     onError={(e) => {
-                                        console.error('Image failed to load:', e.target.src);
+                                        console.error('Portfolio image failed to load:', e.target.src);
                                         console.error('Original imgLink:', project.imgLink);
                                         e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMmEyYTJhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
                                     }}
                                     onLoad={(e) => {
-                                        console.log('Image loaded successfully:', e.target.src);
+                                        console.log('Portfolio image loaded successfully:', e.target.src);
                                     }}
                                     loading="lazy"
                                 />
