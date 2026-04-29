@@ -144,9 +144,9 @@ function SolutionsSection() {
     setSolutionsLoading(true);
     setSolutionsError('');
     try {
-      console.log('[Solution] Fetching solutions from:', `${webUrl}solutions`);
+      console.log('[Solution] Fetching solutions from:', `${webUrl}/solutions`);
       
-      const response = await fetch(`${webUrl}solutions`, {
+      const response = await fetch(`${webUrl}/solutions`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -212,8 +212,8 @@ function SolutionsSection() {
       }
 
       const url = editId 
-        ? `${webUrl}solutions/${editId}`
-        : `${webUrl}solutions`;
+        ? `${webUrl}/solutions/${editId}`
+        : `${webUrl}/solutions`;
       
       const method = editId ? 'PUT' : 'POST';
 
@@ -281,7 +281,7 @@ function SolutionsSection() {
       try {
         console.log('[Solution] Deleting solution:', id);
         
-        const response = await fetch(`${webUrl}solutions/${id}`, {
+        const response = await fetch(`${webUrl}/solutions/${id}`, {
           method: 'DELETE',
           credentials: 'include'
         });

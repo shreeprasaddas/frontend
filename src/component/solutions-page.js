@@ -22,9 +22,9 @@ const Solutions = () => {
     const fetchSolutions = async () => {
         setIsLoading(true);
         try {
-            console.log('[Solutions Page] Fetching from:', `${webUrl}solutions`);
+            console.log('[Solutions Page] Fetching from:', `${webUrl}/solutions`);
             
-            const response = await fetch(`${webUrl}solutions`, {
+            const response = await fetch(`${webUrl}/solutions`, {
                 method: 'GET',
                 credentials: 'include'
             });
