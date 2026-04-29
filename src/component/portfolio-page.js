@@ -60,6 +60,9 @@ const Portfolio = () => {
                             <div className="image-container">
                                 <img 
                                     src={(() => {
+                                        if (project.imgLink?.startsWith('data:')) {
+                                            return project.imgLink;
+                                        }
                                         if (project.imgLink?.startsWith('http')) {
                                             return project.imgLink;
                                         }
