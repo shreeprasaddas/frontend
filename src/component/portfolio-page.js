@@ -16,6 +16,22 @@ const Portfolio = () => {
             try {
                 const projectList = await fetchPortfolioData();
                 
+                // Handle error response from backend
+                if (!Array.isArray(projectList)) {
+                    console.error("Invalid response format:", projectList);
+                    setProjects([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // Check if first item has Data
+                if (!projectList[0] || !projectList[0].Data) {
+                    console.warn("No portfolio data available");
+                    setProjects([]);
+                    setIsLoading(false);
+                    return;
+                }
+                
                 // Set default project image fallback if not present
                 projectList[0].Data.forEach((project) => {
                     const imageUrl = project.imgLink?.startsWith('http') 
@@ -26,6 +42,7 @@ const Portfolio = () => {
                 setProjects(projectList[0].Data);
             } catch (error) {
                 console.error("Error in fetching data:", error);
+                setProjects([]);
             } finally {
                 setIsLoading(false);
             }
