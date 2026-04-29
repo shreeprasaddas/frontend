@@ -22,16 +22,21 @@ const Solutions = () => {
     const fetchSolutions = async () => {
         setIsLoading(true);
         try {
+            console.log('[Solutions Page] Fetching from:', `${webUrl}solutions`);
+            
             const response = await fetch(`${webUrl}solutions`, {
                 method: 'GET',
                 credentials: 'include'
             });
+            
+            console.log('[Solutions Page] Response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const data = await response.json();
+            console.log('[Solutions Page] Data received:', data);
             
             if (data.success && data.data) {
                 setSolutions(data.data);
@@ -42,11 +47,11 @@ const Solutions = () => {
                         : `${webUrl}${solution.imgLink?.startsWith('/') ? solution.imgLink.slice(1) : solution.imgLink}`;
                 });
             } else {
-                console.error("No solutions data found");
+                console.error('[Solutions Page] No solutions data found');
                 setSolutions([]);
             }
         } catch (error) {
-            console.error("Error fetching solutions:", error);
+            console.error('[Solutions Page] Error fetching solutions:', error);
             setSolutions([]);
         } finally {
             setIsLoading(false);

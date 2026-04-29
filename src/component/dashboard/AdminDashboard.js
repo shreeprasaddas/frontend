@@ -144,23 +144,30 @@ function SolutionsSection() {
     setSolutionsLoading(true);
     setSolutionsError('');
     try {
+      console.log('[Solution] Fetching solutions from:', `${webUrl}solutions`);
+      
       const response = await fetch(`${webUrl}solutions`, {
         method: 'GET',
         credentials: 'include'
       });
+      
+      console.log('[Solution] Fetch response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log('[Solution] Fetched solutions:', data);
+      
       if (data.success && data.data) {
         setSolutions(data.data);
       } else {
+        console.warn('[Solution] Invalid response format:', data);
         setSolutions([]);
       }
     } catch (error) {
-      console.error('Error fetching solutions:', error);
+      console.error('[Solution] Error fetching solutions:', error);
       setSolutionsError(error.message);
       setSolutions([]);
     } finally {
@@ -184,23 +191,24 @@ function SolutionsSection() {
       formData.append('category', solutionForm.category || '');
       formData.append('status', solutionForm.status || 'Active');
       
-      console.log('Frontend Solution Form Data:', {
+      console.log('[Solution] Form submission:', {
         title: solutionForm.title,
         description: solutionForm.description,
         features: solutionForm.features,
         technologies: solutionForm.technologies,
         category: solutionForm.category,
         status: solutionForm.status,
-        hasFile: !!selectedFile
+        hasFile: !!selectedFile,
+        isEdit: !!editId
       });
       
       // Add file or imgLink
       if (selectedFile) {
         formData.append('image', selectedFile);
-        console.log('Adding file:', selectedFile.name);
+        console.log('[Solution] Adding file:', selectedFile.name);
       } else if (solutionForm.imgLink && !solutionForm.imgLink.startsWith('data:')) {
         formData.append('imgLink', solutionForm.imgLink);
-        console.log('Adding imgLink:', solutionForm.imgLink);
+        console.log('[Solution] Adding imgLink:', solutionForm.imgLink);
       }
 
       const url = editId 
@@ -209,17 +217,25 @@ function SolutionsSection() {
       
       const method = editId ? 'PUT' : 'POST';
 
+      console.log(`[Solution] Sending ${method} request to:`, url);
+      
       const response = await fetch(url, {
         method: method,
         credentials: 'include',
         body: formData
       });
 
+      console.log('[Solution] Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('[Solution] Error response:', errorData);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || ''}`);
       }
 
       const result = await response.json();
+      console.log('[Solution] Success response:', result);
+      
       if (result.success) {
         setSolutionForm({ 
           title: '', 
@@ -239,7 +255,7 @@ function SolutionsSection() {
         alert(result.message || 'Operation failed');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('[Solution] Error:', error);
       alert('Operation failed: ' + error.message);
     } finally {
       setIsSubmitting(false);
@@ -263,16 +279,22 @@ function SolutionsSection() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this solution?')) {
       try {
+        console.log('[Solution] Deleting solution:', id);
+        
         const response = await fetch(`${webUrl}solutions/${id}`, {
           method: 'DELETE',
           credentials: 'include'
         });
+
+        console.log('[Solution] Delete response status:', response.status);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
+        console.log('[Solution] Delete result:', result);
+        
         if (result.success) {
           fetchSolutions(); // Refresh the list
           alert('Solution deleted successfully!');
@@ -280,7 +302,7 @@ function SolutionsSection() {
           alert(result.message || 'Delete failed');
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('[Solution] Delete error:', error);
         alert('Delete failed: ' + error.message);
       }
     }
