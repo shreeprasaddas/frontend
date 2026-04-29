@@ -49,15 +49,34 @@ function Admin() {
   }, []);
 
   const checkAuthStatus = () => {
-    const token = document.cookie
+    // Primary: Check localStorage for token (persists across page refreshes)
+    const localToken = localStorage.getItem('admin_token');
+    
+    if (localToken) {
+      console.log('Found token in localStorage - restoring session');
+      setIsAuthenticated(true);
+      fetchDashboardData();
+      return;
+    }
+    
+    // Fallback: Check cookies (for backward compatibility)
+    const cookieToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('uid='))
       ?.split('=')[1];
     
-    if (token) {
+    if (cookieToken) {
+      console.log('Found token in cookie - restoring session and syncing to localStorage');
+      // Save to localStorage for persistence
+      localStorage.setItem('admin_token', cookieToken);
       setIsAuthenticated(true);
       fetchDashboardData();
+      return;
     }
+    
+    // No token found
+    console.log('No authentication token found');
+    setIsAuthenticated(false);
   };
 
   // Authentication functions
@@ -71,11 +90,19 @@ function Admin() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginForm),
+        credentials: 'include'  // Include cookies in request
       });
 
       const data = await response.json();
 
       if (data.token) {
+        // ✅ Save token to localStorage (persists across refreshes)
+        localStorage.setItem('admin_token', data.token);
+        // ✅ Save user info
+        localStorage.setItem('user_info', JSON.stringify({ email: loginForm.email }));
+        // ✅ Save auth timestamp
+        localStorage.setItem('auth_timestamp', Date.now().toString());
+        
         setIsAuthenticated(true);
         setLoginForm({ email: "", password: "" });
         fetchDashboardData();
@@ -90,9 +117,18 @@ function Admin() {
   };
 
   const handleLogout = () => {
+    // ✅ Clear localStorage
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('user_info');
+    localStorage.removeItem('auth_timestamp');
+    
+    // ✅ Clear cookies
     document.cookie = "uid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "uid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure";
+    
     setIsAuthenticated(false);
     setActiveTab("overview");
+    console.log('User logged out - session cleared');
   };
 
   // Data fetching functions
