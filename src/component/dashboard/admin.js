@@ -180,33 +180,51 @@ function Admin() {
 
     try {
       const formData = new FormData();
-      Object.keys(projectForm).forEach(key => {
-        formData.append(key, projectForm[key]);
-      });
       
+      // Append only necessary fields (not imgLink which comes from file)
+      formData.append('tittle', projectForm.tittle);
+      formData.append('link', projectForm.link);
+      formData.append('paragraph', projectForm.paragraph);
+      
+      // Append file with correct field name 'img' (as expected by backend multer)
       if (selectedFile) {
-        formData.append('image', selectedFile);
+        formData.append('img', selectedFile);
+      }
+      
+      // For updates, also send the old title so backend can find the post to update
+      if (editTittle) {
+        formData.append('oldTittle', editTittle);
       }
 
+      // Use correct backend endpoints
       const url = editTittle 
-        ? `${API_URL}/projects/${editTittle}` 
-        : `${API_URL}/projects`;
+        ? `${API_URL}/updatePost`  // Backend endpoint for updates
+        : `${API_URL}/addPost`;     // Backend endpoint for new posts
       
-      const method = editTittle ? "PUT" : "POST";
+      // Both are POST requests to backend (not PUT)
+      const method = 'POST';
 
       const response = await fetch(url, {
         method,
         body: formData,
+        credentials: 'include',  // Include cookies for authentication
       });
 
-      if (response.ok) {
+      const result = await response.json();
+      
+      // Check response based on what endpoint returned
+      if (result.isPostAdded || result.isUpdated) {
         setProjectForm({ tittle: "", link: "", imgLink: "", paragraph: "" });
         setSelectedFile(null);
         setEditTittle(null);
         fetchProjects();
+        alert(editTittle ? "Project updated successfully!" : "Project added successfully!");
+      } else {
+        alert(result.message || "Failed to save project");
       }
     } catch (error) {
       console.error("Error saving project:", error);
+      alert("Error saving project. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -215,12 +233,24 @@ function Admin() {
   const handleProjectDelete = async (tittle) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {
-        await fetch(`${API_URL}/projects/${tittle}`, { 
-          method: "DELETE" 
+        const response = await fetch(`${API_URL}/deletePost`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tittle }),
+          credentials: 'include',  // Include cookies for authentication
         });
-        fetchProjects();
+
+        const result = await response.json();
+        
+        if (result.isPostDeleted) {
+          fetchProjects();
+          alert("Project deleted successfully!");
+        } else {
+          alert(result.error || "Failed to delete project");
+        }
       } catch (error) {
         console.error("Error deleting project:", error);
+        alert("Error deleting project. Please try again.");
       }
     }
   };

@@ -42,6 +42,12 @@ const Dashboard = () => {
     data.append('tittle', formData.tittle);
     data.append('link', formData.link);
     data.append('paragraph', formData.paragraph);
+    
+    // For updates, send the old title so backend can find the post to update
+    if (isEditing && formData.oldTittle) {
+      data.append('oldTittle', formData.oldTittle);
+    }
+    
     if (formData.img) {
       data.append('img', formData.img);
     }
@@ -52,12 +58,12 @@ const Dashboard = () => {
       
       if (isEditing) {
         url = `${API_URL}/updatePost`;
-        data.append('oldTittle', formData.oldTittle);
       }
 
       const response = await fetch(url, {
         method: method,
-        body: data
+        body: data,
+        credentials: 'include',  // Include cookies for authentication
       });
 
       const result = await response.json();
@@ -66,9 +72,13 @@ const Dashboard = () => {
         fetchPosts();
         setFormData({ oldTittle: '', tittle: '', link: '', paragraph: '', img: null });
         setIsEditing(false);
+        alert(isEditing ? "Post updated successfully!" : "Post added successfully!");
+      } else {
+        alert(result.message || "Failed to save post");
       }
     } catch (error) {
       console.error('Error submitting post:', error);
+      alert("Error submitting post. Please try again.");
     }
   };
 
@@ -84,17 +94,28 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (tittle) => {
+    if (!window.confirm('Are you sure you want to delete this post?')) {
+      return;
+    }
+
     try {
       const response = await fetch(`${API_URL}/deletePost`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tittle }),
+        credentials: 'include',  // Include cookies for authentication
       });
 
       const result = await response.json();
-      if (result.isPostDeleted) fetchPosts();
+      if (result.isPostDeleted) {
+        fetchPosts();
+        alert('Post deleted successfully!');
+      } else {
+        alert(result.error || 'Failed to delete post');
+      }
     } catch (error) {
       console.error('Error deleting post:', error);
+      alert("Error deleting post. Please try again.");
     }
   };
 
