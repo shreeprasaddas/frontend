@@ -210,9 +210,12 @@ export default function NavBar(){
         <div className="logo" style={isMobile ? { display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' } : {}}>
              {isMobile ? (
                <>
-                 <Link to="/" style={{ textDecoration: 'none' }}>
-                   <span style={{color: '#27CDCD', fontWeight: 'bold', fontSize: '1.2rem', fontFamily: "'Inter', sans-serif"}}>PORTFOLIO</span>
-                 </Link>
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                   {Menu}
+                   <Link to="/" style={{ textDecoration: 'none' }}>
+                     <span style={{color: '#27CDCD', fontWeight: 'bold', fontSize: '1.2rem', fontFamily: "'Inter', sans-serif"}}>PORTFOLIO</span>
+                   </Link>
+                 </div>
                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                    <Link to="/">
                      <button style={{
@@ -225,7 +228,7 @@ export default function NavBar(){
                        textDecoration: 'none'
                      }}>Home</button>
                    </Link>
-                   <Link to="/contact">
+                   <Link to="/portfolio">
                      <button style={{
                        backgroundColor: 'transparent',
                        color: '#27CDCD',
@@ -235,9 +238,8 @@ export default function NavBar(){
                        fontSize: '12px',
                        cursor: 'pointer',
                        textDecoration: 'none'
-                     }}>Contact</button>
+                     }}>Portfolio</button>
                    </Link>
-                   {Menu}
                  </div>
                </>
              ) : nav3dLogo()}
