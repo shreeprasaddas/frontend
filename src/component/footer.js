@@ -10,10 +10,23 @@ export default function Footer(){
     const [cfg, setCfg] = useState(null);
 
     useEffect(() => {
-        fetch(`${API_URL}/config`)
-            .then(r => r.json())
-            .then(data => setCfg(data))
-            .catch(() => {});
+        const fetchConfig = async () => {
+            try {
+                const response = await fetch(`${API_URL}/config`);
+                if (!response.ok) {
+                    console.warn(`[FOOTER] Config fetch failed with status ${response.status}`);
+                    return;
+                }
+                const data = await response.json();
+                console.log('[FOOTER] Config fetched successfully');
+                setCfg(data);
+            } catch (error) {
+                console.warn('[FOOTER] Failed to fetch config:', error.message);
+                // Will use fallback defaults
+            }
+        };
+        
+        fetchConfig();
     }, []);
 
     const email    = cfg?.email    || 'shreepsd2@gmail.com';
