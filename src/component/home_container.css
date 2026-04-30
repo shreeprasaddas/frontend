@@ -230,6 +230,19 @@ html {
   transform: translateY(-3px);
 }
 
+.cta-button.cv {
+  background: linear-gradient(135deg, rgba(39, 205, 205, 0.8) 0%, rgba(27, 184, 184, 0.8) 100%);
+  color: #000;
+  border: 1px solid rgba(27, 184, 184, 0.5);
+  box-shadow: 0 8px 25px rgba(39, 205, 205, 0.25);
+}
+
+.cta-button.cv:hover {
+  background: linear-gradient(135deg, #27CDCD 0%, #1BB8B8 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(27, 184, 184, 0.4);
+}
+
 /* Remove old image styles - now using background approach */
 
 /* Stats Section */

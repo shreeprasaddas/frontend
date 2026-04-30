@@ -8,6 +8,9 @@ export default function HomeContainer(props) {
   const [currentSkill, setCurrentSkill] = useState(0);
   const [typedText, setTypedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
+  const [cvLink, setCvLink] = useState(null);
+
+  const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/+$/, "");
 
   const skills = [
     { name: 'MongoDB', icon: 'Assets/logo/mongodb-svgrepo-com (1).png', level: 90, color: '#47A248' },
@@ -49,6 +52,28 @@ export default function HomeContainer(props) {
     }, 100);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Fetch CV link from config
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch(`${API_URL}/config`);
+        if (!response.ok) {
+          console.warn(`[HOME] Config fetch failed with status ${response.status}`);
+          return;
+        }
+        const data = await response.json();
+        console.log('[HOME] Config fetched successfully');
+        if (data.cvLink) {
+          setCvLink(data.cvLink);
+        }
+      } catch (error) {
+        console.warn('[HOME] Failed to fetch config:', error.message);
+      }
+    };
+    
+    fetchConfig();
   }, []);
 
   // Scroll animation trigger
@@ -104,6 +129,11 @@ export default function HomeContainer(props) {
               <Link to="/portfolio" className="cta-button secondary">
                 <span>View Work</span>
               </Link>
+              {cvLink && (
+                <a href={cvLink} download="Shreeprasad Resume" className="cta-button cv">
+                  <span>📄 Download CV</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
