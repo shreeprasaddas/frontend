@@ -3,13 +3,16 @@ import './second-home.css'
 import SecondHomeBackground from "./second-home-background";
 import ProfileIMG from './second-home-page-image.png';
 import { menuClose } from "./NavBar";
-import resume from './resume.pdf'
 import getData from "./click";
 
 const data = getData();
 console.log(data);
+
 export default function SecondHome() {
-  const [isMobile,setMobile]= useState(window.innerWidth > 720? false:true);
+  const [isMobile, setMobile] = useState(window.innerWidth > 720 ? false : true);
+  const [cvLink, setCvLink] = useState(null);
+  const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/+$/, "");
+
   function checkScreen(){
     if (window.innerWidth < 834) {
       setMobile(true)
@@ -18,8 +21,29 @@ export default function SecondHome() {
       setMobile(false)
     }
     console.log(isMobile);
-    
   }
+
+  // Fetch CV link from config
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch(`${API_URL}/config`);
+        if (!response.ok) {
+          console.warn(`[SECOND HOME] Config fetch failed with status ${response.status}`);
+          return;
+        }
+        const data = await response.json();
+        console.log('[SECOND HOME] Config fetched successfully');
+        if (data.cvLink) {
+          setCvLink(data.cvLink);
+        }
+      } catch (error) {
+        console.warn('[SECOND HOME] Failed to fetch config:', error.message);
+      }
+    };
+    
+    fetchConfig();
+  }, []);
   const profileImage= <div className="main-home-image-section">
    <img src={ProfileIMG} alt="Shree Prasad's profile" />
 
@@ -42,7 +66,13 @@ export default function SecondHome() {
           I'm Shree <span>Prasad</span>
         </h1>
         <p>I am A Full Stack Web Developer </p>
-        <a href={resume} download="Shreeprasad Resume"><button className="donload-cv-btn">Download CV</button></a>
+        {cvLink ? (
+          <a href={cvLink} download="Shreeprasad Resume" target="_blank" rel="noopener noreferrer">
+            <button className="donload-cv-btn">Download CV</button>
+          </a>
+        ) : (
+          <button className="donload-cv-btn" disabled>Loading CV...</button>
+        )}
       </div>
       
         {isMobile? profileImage :profile3d }
