@@ -48,17 +48,13 @@
 /* Enhanced Project Cards */
 .element {
     position: relative;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(39, 205, 205, 0.15);
+    background: transparent;
+    border: none;
     border-radius: 25px;
-    overflow: hidden;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
     cursor: pointer;
-    transform-style: preserve-3d;
-    aspect-ratio: 16/12;
+    display: flex;
+    flex-direction: column;
     opacity: 0;
     animation: fadeInCard 0.8s ease-out forwards;
 }
@@ -91,24 +87,51 @@
     pointer-events: none;
 }
 
-.element:hover {
-    transform: translateY(-15px) rotateX(2deg) rotateY(2deg);
-    border-color: rgba(39, 205, 205, 0.4);
-    box-shadow: 0 25px 60px rgba(39, 205, 205, 0.2),
-                0 15px 40px rgba(0, 0, 0, 0.4);
+.image-container:hover::before {
+    opacity: 1;
 }
 
-.element:hover::before {
-    opacity: 1;
+.image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(39, 205, 205, 0.05) 50%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* Advanced Image Container */
 .image-container {
- position: relative;
+    position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(39, 205, 205, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    aspect-ratio: 16/12;
+}
+
+.image-container:hover {
+    transform: translateY(-15px) rotateX(2deg) rotateY(2deg);
+    border-color: rgba(39, 205, 205, 0.4);
+    box-shadow: 0 25px 60px rgba(39, 205, 205, 0.2),
+                0 15px 40px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
 }
 
 .element img {
@@ -123,7 +146,7 @@
 
 .element:hover img {
     transform: scale(1.05);
-    filter: brightness(0.85) contrast(1.2) saturate(1.1);
+    filter: brightness(0.75) contrast(1.2) saturate(1.1) blur(5px);
 }
 
 .image-overlay {
@@ -202,6 +225,41 @@
 .element:hover .project_heading {
     font-size: 1.6rem;
     color: #fff;
+}
+
+/* Project Title Section (Outside Image) */
+.project-title-section {
+    width: 100%;
+    padding: 20px 15px;
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(14, 135, 135, 0.15) 100%);
+    border-bottom: 1px solid rgba(39, 205, 205, 0.1);
+    border-radius: 0 0 15px 15px;
+    transition: all 0.5s ease;
+}
+
+.image-container:hover ~ .project-title-section {
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(14, 135, 135, 0.3) 100%);
+    border-bottom-color: rgba(39, 205, 205, 0.3);
+}
+
+.project_title_outside {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #27CDCD;
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    transition: all 0.5s ease;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.image-container:hover ~ .project-title-section .project_title_outside {
+    color: #fff;
+    font-size: 1.5rem;
 }
 
 @keyframes textGlow {

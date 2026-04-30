@@ -101,7 +101,6 @@ const Portfolio = () => {
                             </div>
                             <div className="content">
                                 <div className="content-inner">
-                                    <h1 className="project_heading">{project.tittle}</h1>
                                     <p className="project_paragraph">{project.paragraph}</p>
                                     {project.link && (
                                         <a 
@@ -118,6 +117,9 @@ const Portfolio = () => {
                                         </a>
                                     )}
                                 </div>
+                            </div>
+                            <div className="project-title-section">
+                                <h2 className="project_title_outside">{project.tittle}</h2>
                             </div>
                         </div>
                     ))
