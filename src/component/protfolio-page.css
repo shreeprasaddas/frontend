@@ -122,8 +122,8 @@
 }
 
 .element:hover img {
-    transform: scale(1.08);
-    filter: brightness(0.7) contrast(1.2) saturate(1.1);
+    transform: scale(1.05);
+    filter: brightness(0.85) contrast(1.2) saturate(1.1);
 }
 
 .image-overlay {
@@ -148,35 +148,34 @@
 /* Enhanced Content Overlay */
 .content {
   position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(0, 0, 0, 0.4) 0%, 
-        rgba(14, 135, 135, 0.3) 50%, 
-        rgba(0, 0, 0, 0.5) 100%);
-    backdrop-filter: blur(3px);
+    background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.7) 100%);
+    backdrop-filter: blur(0px);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     padding: 30px 25px;
     text-align: center;
-    border-radius: 25px;
+    border-radius: 0 0 25px 25px;
     opacity: 1;
     transform: translateY(0) scale(1);
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 2;
+    min-height: 100px;
 }
 
 .element:hover .content {
     opacity: 1;
-    background: linear-gradient(135deg, 
-        rgba(0, 0, 0, 0.8) 0%, 
-        rgba(14, 135, 135, 0.6) 50%, 
-        rgba(0, 0, 0, 0.9) 100%);
-    backdrop-filter: blur(3px);
+    background: linear-gradient(180deg, 
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.95) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     transform: translateY(0) scale(1);
 }
 
@@ -184,30 +183,25 @@
   display: flex;
     flex-direction: column;
   align-items: center;
-  justify-content: center;
-    height: 100%;
+  justify-content: flex-end;
+    width: 100%;
     text-align: center;
 }
 
 /* Advanced Typography */
 .project_heading {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 15px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
     color: #27CDCD;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     transition: all 0.5s ease;
+    line-height: 1.2;
 }
 
 .element:hover .project_heading {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: #fff;
-    background: linear-gradient(135deg, #fff 0%, #27CDCD 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: textGlow 2s ease-in-out infinite alternate;
 }
 
 @keyframes textGlow {
@@ -216,18 +210,21 @@
 }
 
 .project_paragraph {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #e0e0e0;
-    margin-bottom: 20px;
-    opacity: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #b0b0b0;
+    margin-bottom: 0px;
+    opacity: 0.7;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     max-width: 280px;
     transition: opacity 0.6s ease;
+    display: none;
 }
 
 .element:hover .project_paragraph {
-    opacity: 0.9;
+    display: block;
+    opacity: 0.95;
+    margin-bottom: 15px;
 }
 
 /* Enhanced Project Link */
@@ -250,11 +247,13 @@
     position: relative;
     overflow: hidden;
     opacity: 0;
-    transform: translateY(10px);
+    visibility: hidden;
+    transform: translateY(15px);
 }
 
 .element:hover .project-link {
     opacity: 1;
+    visibility: visible;
     transform: translateY(0);
 }
 
@@ -270,10 +269,10 @@
 }
 
 .project-link:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(39, 205, 205, 0.4);
+    transform: translateY(-5px) scale(1.08);
+    box-shadow: 0 15px 40px rgba(39, 205, 205, 0.5);
     color: #000;
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .project-link:hover::before {
