@@ -648,6 +648,16 @@ html {
   .timeline-marker {
     left: 30px;
   }
+  
+  /* About Section at 900px */
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .about-visual {
+    height: 350px;
+  }
 }
 
 @media only screen and (max-width: 768px) {
@@ -706,6 +716,41 @@ html {
   .float-element {
     font-size: 3rem;
   }
+  
+  /* Tablet About Section Improvements */
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .about-info {
+    text-align: left;
+  }
+  
+  .about-text p {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  
+  .personal-details {
+    background: rgba(50, 253, 224, 0.02);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(28, 119, 105, 0.1);
+  }
+  
+  .detail-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 0;
+  }
+  
+  .detail-label {
+    min-width: 120px;
+    font-size: 0.95rem;
+  }
 }
 
 @media only screen and (max-width: 480px) {
@@ -746,6 +791,67 @@ html {
   .timeline-content {
     padding: 20px;
     max-width: 280px;
+  }
+  
+  /* Mobile About Section Enhancement */
+  .about-section {
+    padding: 40px 15px;
+  }
+  
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .about-info {
+    text-align: center;
+  }
+  
+  .about-text p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+  
+  .personal-details {
+    margin-top: 25px;
+    background: rgba(50, 253, 224, 0.02);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(28, 119, 105, 0.1);
+  }
+  
+  .detail-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    text-align: center;
+  }
+  
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+  }
+  
+  .detail-value {
+    font-size: 0.9rem;
+  }
+  
+  .about-visual {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .float-element {
+    font-size: 2rem;
   }
 }
 
